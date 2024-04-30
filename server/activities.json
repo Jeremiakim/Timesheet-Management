@@ -1,0 +1,23 @@
+[
+    {
+        "activityTitle": "main ikan",
+    "projectName": "prontend",
+
+    "duration": 8,
+    "employeeId":1
+    },
+    {
+        "activityTitle": "Main akan",
+        "projectName": "ui ux",
+
+    "duration": 8,
+    "employeeId":1
+    },
+    {
+        "activityTitle": "Mina ada dua rebi",
+        "projectName": "ui ux",
+
+    "duration": 8,
+    "employeeId":1
+    }
+]
