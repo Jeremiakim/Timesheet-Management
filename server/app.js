@@ -180,7 +180,7 @@ app.post("/activity", async (req, res) => {
 app.get("/activity/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    lo;
+
     const employees = await Activity.findOne({
       attributes: { exclude: ["createdAt", "updatedAt"] },
       where: {
@@ -192,6 +192,7 @@ app.get("/activity/:id", async (req, res) => {
     console.log(err);
   }
 });
+
 app.put("/activity/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -202,33 +203,73 @@ app.put("/activity/:id", async (req, res) => {
       endDate,
       startTime,
       endTime,
-      duration,
     } = req.body;
+    if (
+      !activityTitle ||
+      !projectName ||
+      !startDate ||
+      !endDate ||
+      !startTime ||
+      !endTime
+    ) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    const startDateTime = moment(
+      `${startDate} ${startTime}`,
+      "YYYY-MM-DD HH:mm"
+    );
+
+    const calculateDurationToDate = (durationString) => {
+      const [hours, minutes, seconds] = durationString.split(":").map(Number);
+
+      const date = new Date();
+
+      date.setUTCHours(hours);
+      date.setUTCMinutes(minutes);
+      date.setUTCSeconds(seconds);
+
+      return date;
+    };
+    const endDateTime = moment(`${endDate} ${endTime}`, "YYYY-MM-DD HH:mm");
+    // if (!startDateTime.isValid() || !endDateTime.isValid()) {
+    //   return res.status(400).json({ error: "Invalid date or time format" });
+    // }
+
+    // if (startDateTime.isAfter(endDateTime)) {
+    //   return res
+    //     .status(400)
+    //     .json({ error: "Start date must be before end date" });
+    // }
+
+    const newStartTime = calculateDurationToDate(startTime);
+    const newEndTime = calculateDurationToDate(endTime);
+    const duration = moment
+      .duration(endDateTime.diff(startDateTime))
+      .asMinutes();
     await Activity.update(
       {
         activityTitle,
         projectName,
-        startDate,
-        endDate,
-        startTime,
-        endTime,
+        startDate: new Date(startDate),
+        endDate: new Date(endDate),
+        startTime: new Date(newStartTime),
+        endTime: new Date(newEndTime),
         duration,
       },
       {
-        where: {
-          id: id,
-        },
+        where: { id },
       }
     );
-    const employees = await Activity.findOne({
+
+    const updatedActivity = await Activity.findOne({
+      where: { id },
       attributes: { exclude: ["createdAt", "updatedAt"] },
-      where: {
-        id,
-      },
     });
-    res.status(200).json(employees);
+    res.status(200).json(updatedActivity);
   } catch (err) {
     console.log(err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 });
 

@@ -22,11 +22,14 @@ import formattedDate from "../../../server/utils/formattedDate";
 import formattedTime from "../../../server/utils/formattedTime";
 import calculateDurations from "../utils/calcudura";
 import formatRates from "../utils/formattedRupiah";
+import EditForm from "./EditForm";
 
 const HomePage = () => {
   const [employee, setEmployee] = useState(null);
   const [activities, setActivities] = useState(null);
+  const [selectedActivityId, setSelectedActivityId] = useState(null);
   const [open, setOpen] = useState(false);
+  const [open1, setOpen1] = useState(false);
   const [error, setError] = useState(null);
   const [inputForm, setInputForm] = useState({
     activityTitle: "",
@@ -277,9 +280,14 @@ const HomePage = () => {
                               <Button
                                 variant="outlined"
                                 sx={{ color: "red", borderColor: "red" }}
+                                onClick={() => {
+                                  setSelectedActivityId(activity.id);
+                                  setOpen1(true);
+                                }}
                               >
                                 <EditNoteIcon />
                               </Button>
+
                               <Button
                                 variant="outlined"
                                 sx={{ color: "red", borderColor: "red" }}
@@ -340,9 +348,15 @@ const HomePage = () => {
             p: 4,
           }}
         >
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Tambah Kegiatan Baru
-          </Typography>
+          <div className="flex justify-between">
+            <Typography id="modal-modal-title" variant="h6" component="h2">
+              Tambah Kegiatan Baru
+            </Typography>
+            <Button onClick={handleClose} sx={{ color: "black" }}>
+              <CloseIcon />
+            </Button>
+          </div>
+
           <Typography id="modal-modal-description" sx={{ mt: 2 }}>
             <form className="flex flex-col gap-4" onSubmit={onSubmitForm}>
               <div>
@@ -404,8 +418,19 @@ const HomePage = () => {
               <Button type="submit">Submit</Button>
             </form>
           </Typography>
-          <Button onClick={handleClose}>Close</Button>
         </Box>
+      </Modal>
+      <Modal
+        open={open1}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <EditForm
+          id={selectedActivityId}
+          navigate={navigate}
+          setOpen={setOpen}
+        />
       </Modal>
     </>
   );
