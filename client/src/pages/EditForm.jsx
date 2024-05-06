@@ -4,7 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 const EditForm = ({ id, navigate, setOpen }) => {
-  const [inputForm, setInputForm] = useState({
+  const [inputFormEdit, setInputFormEdit] = useState({
     activityTitle: "",
     projectName: "",
     startDate: "",
@@ -42,7 +42,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
           employeeId: activityData.employeeId,
         };
 
-        setInputForm(formattedActivity);
+        setInputFormEdit(formattedActivity);
       } catch (error) {
         console.log(error);
       }
@@ -64,18 +64,18 @@ const EditForm = ({ id, navigate, setOpen }) => {
   };
 
   const onChange = (e) => {
-    setInputForm({
-      ...inputForm,
+    setInputFormEdit({
+      ...inputFormEdit,
       [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmitEdit = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.put(
         `http://localhost:3000/activity/${id}`,
-        inputForm,
+        inputFormEdit,
         {
           headers: {
             Authorization: `Bearer ${access_token}`,
@@ -113,7 +113,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
       </div>
 
       <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmitEdit}>
           <div>
             <label htmlFor="activityTitle">Activity Title:</label>
             <input
@@ -121,7 +121,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               id="activityTitle"
               name="activityTitle"
               placeholder="______________________"
-              value={inputForm.activityTitle}
+              value={inputFormEdit.activityTitle}
               onChange={onChange}
             />
           </div>
@@ -132,7 +132,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               id="projectName"
               name="projectName"
               placeholder="______________________"
-              value={inputForm.projectName}
+              value={inputFormEdit.projectName}
               onChange={onChange}
             />
           </div>
@@ -142,7 +142,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               type="date"
               id="startDate"
               name="startDate"
-              value={inputForm.startDate}
+              value={inputFormEdit.startDate}
               onChange={onChange}
             />
           </div>
@@ -152,7 +152,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               type="date"
               id="endDate"
               name="endDate"
-              value={inputForm.endDate}
+              value={inputFormEdit.endDate}
               onChange={onChange}
             />
           </div>
@@ -162,7 +162,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               type="time"
               id="startTime"
               name="startTime"
-              value={inputForm.startTime}
+              value={inputFormEdit.startTime}
               onChange={onChange}
             />
           </div>
@@ -172,7 +172,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
               type="time"
               id="endTime"
               name="endTime"
-              value={inputForm.endTime}
+              value={inputFormEdit.endTime}
               onChange={onChange}
             />
           </div>
