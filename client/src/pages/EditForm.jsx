@@ -107,7 +107,7 @@ const EditForm = ({ id, navigate, setOpen }) => {
         <Typography id="modal-modal-title" variant="h6" component="h2">
           Ubah Kegiatan
         </Typography>
-        <Button onClick="" sx={{ color: "black" }}>
+        <Button onClick={() => setOpen(false)} sx={{ color: "black" }}>
           <CloseIcon />
         </Button>
       </div>

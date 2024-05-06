@@ -429,7 +429,7 @@ const HomePage = () => {
         <EditForm
           id={selectedActivityId}
           navigate={navigate}
-          setOpen={setOpen}
+          setOpen={setOpen1}
         />
       </Modal>
     </>
