@@ -2,8 +2,10 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import formattedDate from "../../../server/utils/formattedDate";
+import calculateDurations from "../utils/calcudura";
 
-const EditForm = ({ id, navigate, setOpen }) => {
+const EditForm = ({ id, navigate, setOpen, activities, setActivities }) => {
   const [inputFormEdit, setInputFormEdit] = useState({
     activityTitle: "",
     projectName: "",
@@ -15,8 +17,8 @@ const EditForm = ({ id, navigate, setOpen }) => {
     employeeId: "",
   });
   //   const [open, setOpen] = useState(false);
-
   //   const navigate = useNavigate();
+  console.log(activities);
   const access_token = localStorage.getItem("access_token");
 
   useEffect(() => {
@@ -84,6 +86,20 @@ const EditForm = ({ id, navigate, setOpen }) => {
       );
       navigate("/");
       setOpen(false);
+      const newActivity = {
+        ...response.data,
+        formattedStartDate: formattedDate(response.data.startDate),
+        formattedEndDate: formattedDate(response.data.endDate),
+        formattedStartTime: formattedTime(response.data.startTime),
+        formattedEndTime: formattedTime(response.data.endTime),
+        duration: calculateDurations(
+          response.data.startTime,
+          response.data.endTime
+        ),
+      };
+      console.log(activities);
+      setActivities([...activities, newActivity]);
+      console.log(activities);
     } catch (error) {
       console.log(error);
     }

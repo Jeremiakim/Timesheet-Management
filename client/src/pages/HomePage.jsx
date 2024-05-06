@@ -1,28 +1,31 @@
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import Table from "@mui/material/Table";
-import TableBody from "@mui/material/TableBody";
-import TableCell from "@mui/material/TableCell";
-import TableContainer from "@mui/material/TableContainer";
-import TableHead from "@mui/material/TableHead";
-import TableRow from "@mui/material/TableRow";
-import Paper from "@mui/material/Paper";
-import { Button } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import EditNoteIcon from "@mui/icons-material/EditNote";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Modal from "@mui/material/Modal";
-import CloseIcon from "@mui/icons-material/Close";
-import { useNavigate } from "react-router-dom";
-
 import { jwtDecode } from "jwt-decode";
 import formattedDate from "../../../server/utils/formattedDate";
 import formattedTime from "../../../server/utils/formattedTime";
 import calculateDurations from "../utils/calcudura";
 import formatRates from "../utils/formattedRupiah";
 import EditForm from "./EditForm";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  Button,
+  Typography,
+  Modal,
+  Box,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditNoteIcon from "@mui/icons-material/EditNote";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import CloseIcon from "@mui/icons-material/Close";
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
   const [employee, setEmployee] = useState(null);
@@ -41,6 +44,8 @@ const HomePage = () => {
     duration: "",
     employeeId: "",
   });
+  const [projectNames, setProjectNames] = useState([]);
+  const [selectedProjects, setSelectedProjects] = useState([]);
   const navigate = useNavigate();
 
   const access_token = localStorage.getItem("access_token");
@@ -79,6 +84,13 @@ const HomePage = () => {
         }));
 
         setActivities(formattedActivities);
+
+        const uniqueProjectNames = [
+          ...new Set(
+            formattedActivities.map((activity) => activity.projectName)
+          ),
+        ];
+        setProjectNames(uniqueProjectNames);
       } catch (error) {
         console.log(error);
       }
@@ -144,9 +156,19 @@ const HomePage = () => {
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
+  const filterActivitiesByProject = () => {
+    if (selectedProjects.length === 0) {
+      return activities;
+    } else {
+      return activities.filter((activity) =>
+        selectedProjects.includes(activity.projectName)
+      );
+    }
+  };
+
   const calculateTotalDuration = () => {
     let totalDuration = 0;
-    activities.forEach((activity) => {
+    filterActivitiesByProject().forEach((activity) => {
       if (typeof activity.duration === "string") {
         const durationParts = activity.duration.split(" ");
         const hours = parseInt(durationParts[0]);
@@ -159,13 +181,12 @@ const HomePage = () => {
     });
     return totalDuration;
   };
+
   const calculateTotalIncome = () => {
     const totalDuration = calculateTotalDuration();
     const ratePerHour = employee.rate;
     const totalHours = Math.floor(totalDuration / 60);
-
     const totalIncome = totalHours * ratePerHour;
-
     return totalIncome;
   };
 
@@ -192,21 +213,39 @@ const HomePage = () => {
               <div>
                 <hr className="border-b-2 border-gray-400 w-[75rem]" />
               </div>
-              <div className="flex flex-row gap-[2rem] m-4 my-[3rem]">
-                <div>
+              <div className="flex flex-row justify-between gap-[2rem] m-4 my-[3rem]">
+                <div className="flex flex-row gap-3">
                   <p className="text-xl font-bold">Daftar Kegiatan</p>
+                  <div>
+                    <Button
+                      variant="contained"
+                      className="text-sm"
+                      onClick={handleOpen}
+                    >
+                      <span>
+                        <AddCircleOutlineIcon />
+                      </span>
+                      <span>Tambah Kegiatan</span>
+                    </Button>
+                  </div>
                 </div>
-                <div>
-                  <Button
-                    variant="contained"
-                    className="text-sm"
-                    onClick={handleOpen}
+                <div className="flex items-center">
+                  <label htmlFor="" className="mr-2">
+                    Filter
+                  </label>
+                  <Select
+                    multiple
+                    value={selectedProjects}
+                    onChange={(e) => setSelectedProjects(e.target.value)}
+                    displayEmpty
+                    inputProps={{ "aria-label": "Without label" }}
                   >
-                    <span>
-                      <AddCircleOutlineIcon />
-                    </span>
-                    <span>Tambah Kegiatan</span>
-                  </Button>
+                    {projectNames.map((projectName) => (
+                      <MenuItem key={projectName} value={projectName}>
+                        {projectName}
+                      </MenuItem>
+                    ))}
+                  </Select>
                 </div>
               </div>
               <div>
@@ -241,14 +280,14 @@ const HomePage = () => {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {activities.length === 0 ? (
+                      {filterActivitiesByProject().length === 0 ? (
                         <TableRow>
                           <TableCell colSpan={8} align="center">
                             Belum ada kegiatan
                           </TableCell>
                         </TableRow>
                       ) : (
-                        activities.map((activity) => (
+                        filterActivitiesByProject().map((activity) => (
                           <TableRow
                             key={activity.name}
                             sx={{
@@ -430,6 +469,8 @@ const HomePage = () => {
           id={selectedActivityId}
           navigate={navigate}
           setOpen={setOpen1}
+          activities={activities}
+          setActivities={setActivities}
         />
       </Modal>
     </>
